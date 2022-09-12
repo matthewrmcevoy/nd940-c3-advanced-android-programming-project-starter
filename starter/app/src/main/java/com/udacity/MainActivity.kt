@@ -1,13 +1,13 @@
 package com.udacity
 
-import android.app.DownloadManager
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.*
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -15,9 +15,14 @@ import android.widget.RadioButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import java.lang.reflect.Array.getInt
 
+private val NOTIFICATION_ID = 0
+private val CHANNEL_ID = "download_channel"
+private val CHANNEL_NAME = "Downloads"
 
 class MainActivity : AppCompatActivity() {
 
@@ -32,7 +37,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+        notificationManager = ContextCompat.getSystemService(applicationContext, NotificationManager::class.java) as NotificationManager
 
+        createChannel(CHANNEL_ID, CHANNEL_NAME)
         registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
 
         custom_button.setOnClickListener {
@@ -41,6 +48,7 @@ class MainActivity : AppCompatActivity() {
             }else {
                 download()
                 custom_button.buttonState = ButtonState.Loading
+                notificationManager.sendNotification("Download Started", applicationContext)
             }
         }
     }
@@ -51,6 +59,7 @@ class MainActivity : AppCompatActivity() {
             if(downloadID==id){
                 Log.i("FragmentActivity","Download Completed")
                 custom_button.buttonState = ButtonState.Completed
+                notificationManager.sendNotification("Download Completed", applicationContext)
             }
         }
     }
@@ -79,6 +88,22 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun createChannel(channelId: String, channelName: String) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            val notificationChannel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH)
+            notificationChannel.enableLights(true)
+            notificationChannel.lightColor = Color.RED
+            notificationChannel.enableVibration(true)
+            notificationChannel.description = "download manager"
+
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
+
+
+
     }
 
     private fun download() {
