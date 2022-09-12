@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity() {
                     Log.i("Frag","Glide Bttn Checked")
                     custom_button.buttonEnabled = true
                     custom_button.invalidate()
-                    URL = "https://github.com/bumptech/glide/archive/refs/heads/master.zip"
+                    URL = "https://github.com/bumptech/glide/archive/master.zip"
                 }
                 R.id.curRepo_radio_bttn -> if(checked){
                     Log.i("Frag","Current Repo Bttn Checked")
@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity() {
                     Log.i("Frag","Retro Bttn Checked")
                     custom_button.buttonEnabled = true
                     custom_button.invalidate()
-                    URL = "https://github.com/square/retrofit/archive/refs/heads/master.zip"
+                    URL = "https://github.com/square/retrofit/archive/master.zip"
                 }
             }
         }
