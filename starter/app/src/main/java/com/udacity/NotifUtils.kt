@@ -10,8 +10,7 @@ private val NOTIFICATION_ID = 0
 private val CHANNEL_ID = "download_channel"
 private val CHANNEL_NAME = "Downloads"
 
-fun NotificationManager.sendNotification(messageBody: String, applicationContext: Context){
-    val contentIntent = Intent(applicationContext, DetailActivity::class.java)
+fun NotificationManager.sendNotification(messageBody: String, applicationContext: Context, contentIntent: Intent){
     val contentPendingIntent = PendingIntent.getActivity(applicationContext, NOTIFICATION_ID, contentIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
 
@@ -19,5 +18,6 @@ fun NotificationManager.sendNotification(messageBody: String, applicationContext
         .setSmallIcon(R.drawable.ic_assistant_black_24dp)
         .setContentTitle("Download Status")
         .setContentText(messageBody)
+        .setContentIntent(contentPendingIntent).addAction(R.drawable.ic_assistant_black_24dp,"View Details",contentPendingIntent)
     notify(NOTIFICATION_ID,builder.build())
 }

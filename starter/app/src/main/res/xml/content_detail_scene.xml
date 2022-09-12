@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <Transition
+        app:constraintSetEnd="@id/end"
+        app:constraintSetStart="@+id/start"
+        app:autoTransition="animateToEnd"
+        app:duration="3000">
+        <KeyFrameSet>
+            <KeyAttribute
+                app:framePosition="0"
+                app:motionTarget="@id/status_txt">
+                <CustomAttribute
+                    app:attributeName="textColor"
+                    app:customColorValue="#000000"/>
+            </KeyAttribute>
+            <KeyAttribute
+                app:framePosition="50"
+                app:motionTarget="@id/status_txt">
+                <CustomAttribute
+                    app:attributeName="textColor"
+                    app:customColorValue="#2196F3"/>
+            </KeyAttribute>
+            <KeyAttribute
+                app:framePosition="100"
+                app:motionTarget="@id/status_txt">
+                <CustomAttribute
+                    app:attributeName="textColor"
+                    app:customColorValue="#000000"/>
+            </KeyAttribute>
+        </KeyFrameSet>
+    </Transition>
+
+    <ConstraintSet android:id="@+id/start">
+    </ConstraintSet>
+    <ConstraintSet android:id="@+id/end">
+    </ConstraintSet>
+</MotionScene>

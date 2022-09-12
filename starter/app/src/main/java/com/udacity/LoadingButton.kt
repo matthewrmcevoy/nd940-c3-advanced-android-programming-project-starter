@@ -44,6 +44,12 @@ class LoadingButton @JvmOverloads constructor(
                 dwnldProg=100
                 invalidate()
             }
+            ButtonState.Clicked -> {
+                buttonText = "DOWNLOAD"
+                dwnldProg=0
+                valueAnimator.start()
+                invalidate()
+            }
         }
     }
     var buttonEnabled = false

@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.database.Cursor
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
@@ -20,15 +21,18 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import java.lang.reflect.Array.getInt
 
-private val NOTIFICATION_ID = 0
-private val CHANNEL_ID = "download_channel"
-private val CHANNEL_NAME = "Downloads"
+const val FILE_NAME = "filename"
+const val STATUS_EX = "status"
 
 class MainActivity : AppCompatActivity() {
+    private val NOTIFICATION_ID = 0
+    private val CHANNEL_ID = "download_channel"
+    private val CHANNEL_NAME = "Downloads"
 
     private var downloadID: Long = 0
     private var URL = "NA"
 
+    private lateinit var downloadManager: DownloadManager
     private lateinit var notificationManager: NotificationManager
     private lateinit var pendingIntent: PendingIntent
     private lateinit var action: NotificationCompat.Action
@@ -42,13 +46,15 @@ class MainActivity : AppCompatActivity() {
         createChannel(CHANNEL_ID, CHANNEL_NAME)
         registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
 
+        val contentIntent = Intent(applicationContext, MainActivity::class.java)
+
         custom_button.setOnClickListener {
             if(URL=="NA"){
                 Toast.makeText(this,"You must select an item first!", Toast.LENGTH_SHORT).show()
             }else {
                 download()
                 custom_button.buttonState = ButtonState.Loading
-                notificationManager.sendNotification("Download Started", applicationContext)
+                notificationManager.sendNotification("Download Started", applicationContext, contentIntent)
             }
         }
     }
@@ -56,10 +62,27 @@ class MainActivity : AppCompatActivity() {
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+            val contentIntent = Intent(applicationContext, DetailActivity::class.java)
+            contentIntent.putExtra(FILE_NAME,when(URL){
+                "https://github.com/bumptech/glide/archive/master.zip" -> "Glide-master.zip"
+                "https://github.com/udacity/nd940-c3-advanced-android-programming-project-starter/archive/master.zip" -> "ND940-c3-advanced-android-programming-project-starter-master.zip"
+                "https://github.com/square/retrofit/archive/master.zip" -> "retrofit-master.zip"
+                else -> "unknown file"
+            })
             if(downloadID==id){
                 Log.i("FragmentActivity","Download Completed")
                 custom_button.buttonState = ButtonState.Completed
-                notificationManager.sendNotification("Download Completed", applicationContext)
+
+                val cursor: Cursor = downloadManager.query(DownloadManager.Query().setFilterById(downloadID))
+                while(cursor.moveToNext()){
+                    val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
+                    when(status){
+                        DownloadManager.STATUS_FAILED -> contentIntent.putExtra(STATUS_EX, "Failure")
+                        DownloadManager.STATUS_SUCCESSFUL -> contentIntent.putExtra(STATUS_EX, "Successful")
+                    }
+                }
+
+                notificationManager.sendNotification("Download Completed", applicationContext, contentIntent)
             }
         }
     }
@@ -117,7 +140,7 @@ class MainActivity : AppCompatActivity() {
                 .setAllowedOverMetered(true)
                 .setAllowedOverRoaming(true)
 
-        val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+        downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
         downloadID =
             downloadManager.enqueue(request)// enqueue puts the download request in the queue.
     }
