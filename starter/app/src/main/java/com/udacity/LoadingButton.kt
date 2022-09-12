@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 import kotlin.properties.Delegates
@@ -26,7 +27,7 @@ class LoadingButton @JvmOverloads constructor(
         when(new){
             ButtonState.Loading->{
                 buttonText = "DOWNLOADING"
-            valueAnimator = ValueAnimator.ofInt(0,widthSize).apply{
+            valueAnimator = ValueAnimator.ofInt(0,100).apply{
                 duration=700
                 addUpdateListener { valueAnimator ->
                     dwnldProg = animatedValue as Int
@@ -67,10 +68,12 @@ class LoadingButton @JvmOverloads constructor(
             false -> painter.color = Color.GRAY
         }
         painter.textAlign = Paint.Align.CENTER
-
         val xPos = (width/2).toFloat()
         val yPos = ((height /2)-((painter.descent()+painter.ascent())/2)).toFloat()
         canvas.drawText(buttonText,xPos,yPos,painter)
+
+        painter.color = resources.getColor(R.color.colorAccent)
+        canvas.drawArc(width-((height*2)-(height*.3)).toFloat(),height*.2.toFloat(),width-height.toFloat(),height*.8.toFloat(),0f,dwnldProg*360/100.toFloat(),true,painter)
 
     }
 
